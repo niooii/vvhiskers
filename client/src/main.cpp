@@ -20,11 +20,11 @@ int main(int argc, char** argv)
     constexpr f64 TEMP_SPF  = 1.0 / TEMP_MAX_FPS;
 
     Engine engine{};
-    auto   client = engine.add_ctx<Client>();
+    auto&  client = engine.add_domain<Client>();
 
-    while (client->is_running())
+    while (client.is_running())
     {
-        client->update();
+        client.update();
 
         if (const auto sleep_time = stopwatch.until(TEMP_SPF); sleep_time > 0)
             time::sleep_ms(sleep_time * 1000);

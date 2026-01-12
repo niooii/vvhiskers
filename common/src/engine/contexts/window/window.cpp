@@ -49,11 +49,13 @@ namespace v {
         const Uint32 window_id = SDL_GetWindowID(sdl_window_);
         if (auto sdl_ctx = engine().get_ctx<SDLContext>())
         {
-            sdl_ctx->window_event().connect([this, window_id](const SDL_Event& event)
-            {
-                if (event.window.windowID == window_id)
-                    this->process_event(event);
-            });
+            sdl_ctx->window_event().connect(
+                this,
+                [this, window_id](const SDL_Event& event)
+                {
+                    if (event.window.windowID == window_id)
+                        this->process_event(event);
+                });
         }
     }
 
@@ -328,7 +330,7 @@ namespace v {
                 static_cast<int>(event.motion.x), static_cast<int>(event.motion.y));
             mouse_delta_ = glm::ivec2(
                 static_cast<int>(event.motion.xrel), static_cast<int>(event.motion.yrel));
-            mouse_moved_event_.fire({mouse_pos_, mouse_delta_});
+            mouse_moved_event_.fire({ mouse_pos_, mouse_delta_ });
             break;
 
         case SDL_EVENT_MOUSE_WHEEL:

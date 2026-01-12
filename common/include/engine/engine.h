@@ -21,7 +21,7 @@ template <typename T>
 concept DerivedFromDomain = std::is_base_of_v<v::Domain<T>, T>;
 
 template <typename T>
-concept DerivedFromContext = std::is_base_of_v<v::Context, T>;
+concept DerivedFromContext = std::is_base_of_v<v::ContextBase, T>;
 
 template <typename T>
 concept DerivedFromSDomain = std::is_base_of_v<v::SDomain<T>, T>;
@@ -266,7 +266,7 @@ namespace v {
         /// Helper to create and initialize a domain, called
         /// every time on domain creation
         /// If entity is provided, domain is owned by that entity (add_component behavior)
-        /// If entity is nullopt, domain owns itself 
+        /// If entity is nullopt, domain owns itself
         template <DerivedFromDomain T, typename... Args>
         T& _init_domain(std::optional<entt::entity> owner, Args&&... args)
         {
@@ -276,7 +276,8 @@ namespace v {
             ptr->init_first(*this, owner);
             ptr->init();
 
-            registry_.emplace_or_replace<query_transform_t<T>>(ptr->entity(), std::move(domain));
+            registry_.emplace_or_replace<query_transform_t<T>>(
+                ptr->entity(), std::move(domain));
 
             return *ptr;
         }
@@ -305,3 +306,4 @@ namespace v {
 } // namespace v
 
 #include <engine/domain.inl>
+#include <engine/signal.inl>

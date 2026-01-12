@@ -6,8 +6,7 @@
 #include <engine/engine.h>
 
 namespace v {
-    DomainBase::DomainBase(std::string name) : name_(std::move(name))
-    {}
+    DomainBase::DomainBase(std::string name) : name_(std::move(name)) {}
 
     void DomainBase::init_first(Engine& engine, std::optional<entt::entity> entity)
     {
@@ -17,6 +16,7 @@ namespace v {
 
     DomainBase::~DomainBase()
     {
+        removing_.fire();
         // entity lifetime is managed by engine
     }
 

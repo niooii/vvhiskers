@@ -9,7 +9,7 @@
 using namespace v;
 
 // Test context for context management
-class TestContext : public Context {
+class TestContext : public Context<TestContext> {
 public:
     explicit TestContext(Engine& engine) : Context(engine) {}
     int value = 42;
@@ -18,9 +18,7 @@ public:
 // Test domain for domain management
 class TestDomain : public Domain<TestDomain> {
 public:
-    TestDomain(std::string name = "TestDomain") :
-        Domain(std::move(name))
-    {}
+    TestDomain(std::string name = "TestDomain") : Domain(std::move(name)) {}
 
     int  counter = 0;
     void update() { counter++; }

@@ -138,7 +138,7 @@ namespace v {
         } };
 
         // resize swapchain on window resize
-        window->resized().connect([this](glm::uvec2) { this->resize(); });
+        resize_conn_ = window->resized().connect([this](glm::uvec2) { this->resize(); });
 
 
         LOG_TRACE("created swapchain, creating task graph now");

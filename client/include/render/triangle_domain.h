@@ -12,7 +12,7 @@ namespace v {
     /// Simple rainbow triangle render domain for testing the RenderDomain API
     class TriangleRenderer : public RenderDomain<TriangleRenderer> {
     public:
-        TriangleRenderer() = default;
+        TriangleRenderer()           = default;
         ~TriangleRenderer() override = default;
 
         void init() override;

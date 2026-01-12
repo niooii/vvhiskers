@@ -7,8 +7,12 @@
 #include <defs.h>
 #include <memory>
 
-// TODO!
 namespace v::mem {
+    struct in_place_t {
+        explicit in_place_t() = default;
+    };
+    inline constexpr in_place_t in_place{};
+
     /// A reference counted smart pointer, not atomic to avoid unneeded overhead
     template <typename T>
     class Rc {
@@ -19,25 +23,34 @@ namespace v::mem {
 
         // Value constructor - creates new T with given args
         template <typename... Args>
-        Rc(Args&&... args) {
+        explicit Rc(in_place_t, Args&&... args)
+        {
             ptr_ = new T(std::forward<Args>(args)...);
-            blk_ = new ControlBlock{1};
+            blk_ = new ControlBlock{ 1 };
         }
 
+        // Non-const lvalue copy
+        Rc(Rc& other) noexcept : Rc(static_cast<const Rc&>(other)) {}
+
         // Copy constructor
-        Rc(const Rc& other) noexcept : ptr_(other.ptr_), blk_(other.blk_) {
-            if (blk_) {
+        Rc(const Rc& other) noexcept : ptr_(other.ptr_), blk_(other.blk_)
+        {
+            if (blk_)
+            {
                 blk_->refc++;
             }
         }
 
         // Copy assignment
-        Rc& operator=(const Rc& other) noexcept {
-            if (this != &other) {
+        Rc& operator=(const Rc& other) noexcept
+        {
+            if (this != &other)
+            {
                 release();
                 ptr_ = other.ptr_;
                 blk_ = other.blk_;
-                if (blk_) {
+                if (blk_)
+                {
                     blk_->refc++;
                 }
             }
@@ -45,17 +58,20 @@ namespace v::mem {
         }
 
         // Move constructor
-        Rc(Rc&& other) noexcept : ptr_(other.ptr_), blk_(other.blk_) {
+        Rc(Rc&& other) noexcept : ptr_(other.ptr_), blk_(other.blk_)
+        {
             other.ptr_ = nullptr;
             other.blk_ = nullptr;
         }
 
         // Move assignment
-        Rc& operator=(Rc&& other) noexcept {
-            if (this != &other) {
+        Rc& operator=(Rc&& other) noexcept
+        {
+            if (this != &other)
+            {
                 release();
-                ptr_ = other.ptr_;
-                blk_ = other.blk_;
+                ptr_       = other.ptr_;
+                blk_       = other.blk_;
                 other.ptr_ = nullptr;
                 other.blk_ = nullptr;
             }
@@ -63,31 +79,22 @@ namespace v::mem {
         }
 
         // Destructor
-        ~Rc() {
-            release();
-        }
+        ~Rc() { release(); }
 
         // Access operators
-        T& operator*() const noexcept {
-            return *ptr_;
-        }
+        T& operator*() const noexcept { return *ptr_; }
 
-        T* operator->() const noexcept {
-            return ptr_;
-        }
+        T* operator->() const noexcept { return ptr_; }
 
         // Get raw pointer
-        T* get() const noexcept {
-            return ptr_;
-        }
+        T* get() const noexcept { return ptr_; }
 
         // Check if non-null
-        explicit operator bool() const noexcept {
-            return ptr_ != nullptr;
-        }
+        explicit operator bool() const noexcept { return ptr_ != nullptr; }
 
         // Reset to null
-        void reset() noexcept {
+        void reset() noexcept
+        {
             release();
             ptr_ = nullptr;
             blk_ = nullptr;
@@ -95,40 +102,43 @@ namespace v::mem {
 
         // Reset with new value
         template <typename... Args>
-        void reset(Args&&... args) {
+        void reset(Args&&... args)
+        {
             release();
             ptr_ = new T(std::forward<Args>(args)...);
-            blk_ = new ControlBlock{1};
+            blk_ = new ControlBlock{ 1 };
         }
 
         // Get reference count
-        u64 use_count() const noexcept {
-            return blk_ ? blk_->refc : 0;
-        }
+        u64 use_count() const noexcept { return blk_ ? blk_->refc : 0; }
 
     private:
         struct ControlBlock {
             u64 refc;
         };
 
-        void release() {
-            if (blk_) {
+        void release()
+        {
+            if (blk_)
+            {
                 blk_->refc--;
-                if (blk_->refc == 0) {
+                if (blk_->refc == 0)
+                {
                     delete ptr_;
                     delete blk_;
                 }
             }
         }
 
-        T* ptr_;
+        T*            ptr_;
         ControlBlock* blk_;
     };
 
     // Helper function to create Rc with type deduction
     template <typename T, typename... Args>
-    Rc<T> make_rc(Args&&... args) {
-        return Rc<T>(std::forward<Args>(args)...);
+    Rc<T> make_rc(Args&&... args)
+    {
+        return Rc<T>(in_place, std::forward<Args>(args)...);
     }
 
     /// haha actually its just std::shared ptr!
@@ -141,7 +151,8 @@ namespace v::mem {
         constexpr Arc(std::nullptr_t) noexcept : ptr_(nullptr) {}
 
         template <typename... Args>
-        Arc(Args&&... args) {
+        Arc(Args&&... args)
+        {
             ptr_ = std::make_shared<T>(std::forward<Args>(args)...);
         }
 
@@ -161,39 +172,28 @@ namespace v::mem {
         ~Arc() = default;
 
         // Access operators
-        T& operator*() const noexcept {
-            return *ptr_;
-        }
+        T& operator*() const noexcept { return *ptr_; }
 
-        T* operator->() const noexcept {
-            return ptr_.get();
-        }
+        T* operator->() const noexcept { return ptr_.get(); }
 
         // Get raw pointer
-        T* get() const noexcept {
-            return ptr_.get();
-        }
+        T* get() const noexcept { return ptr_.get(); }
 
         // Check if non-null
-        explicit operator bool() const noexcept {
-            return ptr_ != nullptr;
-        }
+        explicit operator bool() const noexcept { return ptr_ != nullptr; }
 
         // Reset to null
-        void reset() noexcept {
-            ptr_.reset();
-        }
+        void reset() noexcept { ptr_.reset(); }
 
         // Reset with new value
         template <typename... Args>
-        void reset(Args&&... args) {
+        void reset(Args&&... args)
+        {
             ptr_ = std::make_shared<T>(std::forward<Args>(args)...);
         }
 
         // Get reference count
-        u64 use_count() const noexcept {
-            return ptr_.use_count();
-        }
+        u64 use_count() const noexcept { return ptr_.use_count(); }
 
     private:
         std::shared_ptr<T> ptr_;

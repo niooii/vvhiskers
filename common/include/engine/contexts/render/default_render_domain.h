@@ -13,7 +13,7 @@ namespace v {
     /// Used as a fallback when no other render domains are active.
     class DefaultRenderDomain : public RenderDomain<DefaultRenderDomain> {
     public:
-        DefaultRenderDomain() = default;
+        DefaultRenderDomain()           = default;
         ~DefaultRenderDomain() override = default;
 
         void add_render_tasks(daxa::TaskGraph& graph) override;

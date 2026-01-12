@@ -32,7 +32,6 @@ namespace v {
     RenderContext::~RenderContext() = default;
 
 
-    
     void RenderContext::register_render_domain(RenderDomainBase* domain)
     {
         render_domains_.push_back(domain);
@@ -66,14 +65,17 @@ namespace v {
         // Clear swapchain first (bc windows requires defined initial content)
         window_resources_->render_graph.add_task(
             daxa::Task::Raster("clear_swapchain")
-                .color_attachment.reads_writes(
+                .color_attachment
+                .reads_writes(
                     daxa::ImageViewType::REGULAR_2D,
                     window_resources_->task_swapchain_image)
                 .executes(
                     [this](daxa::TaskInterface ti)
                     {
-                        auto image_id   = ti.get(window_resources_->task_swapchain_image).ids[0];
-                        auto image_view = ti.get(window_resources_->task_swapchain_image).view_ids[0];
+                        auto image_id =
+                            ti.get(window_resources_->task_swapchain_image).ids[0];
+                        auto image_view =
+                            ti.get(window_resources_->task_swapchain_image).view_ids[0];
                         auto image_info = ti.device.image_info(image_id).value();
 
                         auto render_recorder = std::move(ti.recorder).begin_renderpass({

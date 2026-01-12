@@ -13,11 +13,7 @@ namespace v {
         TODO()
     }
 
-    WorldAxesRenderer::~WorldAxesRenderer() {
+    WorldAxesRenderer::~WorldAxesRenderer() {}
 
-    }
-
-    void WorldAxesRenderer::add_render_tasks(daxa::TaskGraph& graph) {
-
-    }
-}
+    void WorldAxesRenderer::add_render_tasks(daxa::TaskGraph& graph) {}
+} // namespace v

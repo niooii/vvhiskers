@@ -7,8 +7,8 @@
 #include <containers/ud_set.h>
 #include <defs.h>
 #include <enet.h>
+#include <engine/signal.h>
 #include <entt/entt.hpp>
-#include <signal.h>
 
 namespace v {
     class NetConnection;
@@ -19,10 +19,16 @@ namespace v {
 
     public:
         /// Signal fired when a new incoming connection is created
-        FORCEINLINE Signal<std::shared_ptr<NetConnection>>& connected() const { return connect_event_.signal(); }
+        FORCEINLINE Signal<std::shared_ptr<NetConnection>> connected() const
+        {
+            return connect_event_.signal();
+        }
 
         /// Signal fired when an incoming connection has been disconnected
-        FORCEINLINE Signal<std::shared_ptr<NetConnection>>& disconnected() const { return disconnect_event_.signal(); }
+        FORCEINLINE Signal<std::shared_ptr<NetConnection>> disconnected() const
+        {
+            return disconnect_event_.signal();
+        }
 
     private:
         NetListener(
@@ -48,7 +54,7 @@ namespace v {
         ud_set<ENetPeer*> connected_;
 
         // Internal events
-        mutable Event<std::shared_ptr<NetConnection>> connect_event_;
-        mutable Event<std::shared_ptr<NetConnection>> disconnect_event_;
+        Event<std::shared_ptr<NetConnection>> connect_event_;
+        Event<std::shared_ptr<NetConnection>> disconnect_event_;
     };
 } // namespace v

@@ -5,7 +5,7 @@
 #pragma once
 
 #include <atomic>
-#include <engine/context.h>
+#include <engine/domain.h>
 #include <memory>
 #include <prelude.h>
 
@@ -18,11 +18,13 @@ namespace v {
     class Window;
     class Camera;
 
-    class Client : public Context<Client> {
+    class Client : public SDomain<Client> {
     public:
-        explicit Client(Engine& engine);
+        explicit Client();
 
         void update();
+
+        void init() override;
 
         bool is_running() const { return running_; }
 

@@ -59,4 +59,10 @@ namespace v {
     {
         return engine().get_ctx<T>();
     }
+
+    template <typename... Ts>
+    auto DomainBase::view()
+    {
+        return engine().view<Ts...>();
+    }
 } // namespace v

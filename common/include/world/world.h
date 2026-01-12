@@ -92,9 +92,7 @@ namespace v {
     public:
         static constexpr i32 k_chunk_size = ChunkDomain::k_size; // 128
 
-        WorldDomain(const std::string& name = "World") :
-            SDomain(name)
-        {}
+        WorldDomain(const std::string& name = "World") : SDomain(name) {}
         ~WorldDomain() override = default;
 
         /// Convert world-space voxel coordinate to chunk position and local position

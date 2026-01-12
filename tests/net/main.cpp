@@ -3,6 +3,7 @@
 #include <engine/contexts/net/connection.h>
 #include <engine/contexts/net/ctx.h>
 #include <engine/contexts/net/listener.h>
+#include <engine/signal.h>
 #include <net/channels.h>
 #include <test.h>
 #include <time/time.h>
@@ -25,37 +26,41 @@ int main()
     std::atomic_bool server_got_chat{ false };
     std::atomic_bool client_got_echo{ false };
 
-    // server component for connect + chat
-    listener->connected().connect([&](std::shared_ptr<NetConnection> con)
-    {
-        on_connect = true;
+    // Store connections to keep them alive
+    SignalConnection               listener_conn;
+    SignalConnection               server_chat_conn;
+    std::shared_ptr<NetConnection> server_con;
 
-        auto& chat = con->create_channel<ChatChannel>();
-        chat.received().connect([&, eng = engine.get()](const ChatMessage& msg)
+    // server component for connect + chat
+    listener_conn = listener->connected().connect(
+        [&](std::shared_ptr<NetConnection> con)
         {
-            server_got_chat = true;
-            // echo message back to all channels
-            auto& net_ctx = eng->get_ctx<NetworkContext>();
-            if (net_ctx) {
-                auto connections = net_ctx->connections_.read();
-                for (auto& [peer, con] : *connections) {
-                    if (auto channel = con->get_channel<ChatChannel>()) {
+            on_connect = true;
+            server_con = con;
+
+            auto& chat       = con->create_channel<ChatChannel>();
+            server_chat_conn = chat.received().connect(
+                [&, eng = engine.get()](const ChatMessage& msg)
+                {
+                    server_got_chat = true;
+                    // echo message back to all channels
+                    for (auto [e, channel] : eng->view<ChatChannel>().each())
+                    {
                         ChatMessage payload{ .msg = msg.msg };
                         channel->send(payload);
                     }
-                }
-            }
+                });
         });
-    });
 
     // create client connection
-    auto  client = net->create_connection(host, port);
-    auto& cchat  = client->create_channel<ChatChannel>();
-    cchat.received().connect([&](const ChatMessage& msg)
-    {
-        if (msg.msg == "ping")
-            client_got_echo = true;
-    });
+    auto  client           = net->create_connection(host, port);
+    auto& cchat            = client->create_channel<ChatChannel>();
+    auto  client_chat_conn = cchat.received().connect(
+        [&](const ChatMessage& msg)
+        {
+            if (msg.msg == "ping")
+                client_got_echo = true;
+        });
 
     bool sent_ping = false;
 

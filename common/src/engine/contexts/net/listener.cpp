@@ -43,4 +43,9 @@ namespace v {
         // Fire the disconnect event
         disconnect_event_.fire(con);
     }
+
+    void NetListener::update()
+    {
+        // TODO! nothing is needed to do here for now
+    }
 } // namespace v

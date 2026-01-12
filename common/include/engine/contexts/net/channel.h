@@ -9,8 +9,8 @@
 #include <defs.h>
 #include <engine/contexts/net/connection.h>
 #include <engine/serial/serde.h>
+#include <engine/signal.h>
 #include <engine/traits.h>
-#include <signal.h>
 #include <exception>
 #include <memory>
 #include "engine/contexts/net/listener.h"
@@ -80,13 +80,11 @@ namespace v {
                 conn_->packet_destroy_queue_.enqueue(std::get<ENetPacket*>(*elem));
             }
 
-            entt_conn_.release();
-
             conn_.reset();
         }
 
         /// Get the signal for receiving payloads on this channel
-        FORCEINLINE Signal<Payload>& received() { return recv_event_.signal(); }
+        FORCEINLINE Signal<Payload> received() { return recv_event_.signal(); }
 
         /// Get the owning NetConnection.
         FORCEINLINE const class std::shared_ptr<NetConnection> connection_info()
@@ -169,10 +167,7 @@ namespace v {
     private:
         // explicit init beacuse i dont want derived class to have to explicitly
         // define constructors
-        void init(std::shared_ptr<NetConnection> c)
-        {
-            conn_ = c;
-        }
+        void init(std::shared_ptr<NetConnection> c) { conn_ = c; }
         std::shared_ptr<NetConnection> connection() const { return conn_; }
 
         /// Calls the listeners and hands packets back to the NetConnection.

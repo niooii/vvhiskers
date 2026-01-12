@@ -18,7 +18,9 @@
 #include <defs.h>
 #include <vmath.h>
 #include <vox/aabb.h>
+#include <vox/volume.h>
 
+// TODO! change to implement VoxelVolume
 namespace v {
     struct GS64Node {};
 
@@ -115,8 +117,10 @@ namespace v {
         FORCEINLINE ChildRange child_indices() { return ChildRange{ child_mask }; };
     };
 
-    class Sparse64Tree {
+    class Sparse64Tree : public VoxelVolume<Sparse64Tree, u8> {
     public:
+        using VoxelType = u8;
+
         explicit Sparse64Tree(u8 depth) :
             bounds_(glm::vec3(0), glm::vec3(v::pow(4.f, static_cast<f32>(depth)))),
             depth_(depth), g_nodes_(static_cast<u32>(v::pow(8.f, depth)))

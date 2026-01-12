@@ -8,6 +8,21 @@
 #include <memory>
 
 namespace v {
+    // not template base class for any Context for typechecking w concepts
+    class ContextBase {
+    public:
+        virtual ~ContextBase() = default;
+
+        // Contexts are non-copyable
+        ContextBase(const ContextBase&)            = delete;
+        ContextBase& operator=(const ContextBase&) = delete;
+
+    protected:
+        explicit ContextBase(class Engine& engine) : engine_{ engine } {}
+
+        Engine& engine_;
+    };
+
     /// The base class for any Context to be attached to the Engine.
     ///
     /// IMPORTANT: When creating derived Context classes, the constructor MUST
@@ -26,17 +41,10 @@ namespace v {
     ///   // WRONG - will cause compile error:
     ///   engine.add_ctx<MyContext>(engine, 1.0 / 60.0);  // Don't pass engine manually!
     template <typename Derived>
-    class Context : public QueryBy<std::unique_ptr<Derived>> {
+    class Context : public ContextBase, public QueryBy<std::unique_ptr<Derived>> {
         friend class Engine;
 
     public:
-        explicit Context(class Engine& engine) : engine_{ engine } {};
-
-        // Contexts are non-copyable
-        Context(const Context&)            = delete;
-        Context& operator=(const Context&) = delete;
-
-    protected:
-        Engine& engine_;
+        explicit Context(class Engine& engine) : ContextBase(engine) {};
     };
 } // namespace v

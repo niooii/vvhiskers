@@ -9,6 +9,7 @@
 #pragma once
 
 #include <defs.h>
+#include <engine/signal.h>
 #include <engine/traits.h>
 #include <entt/entt.hpp>
 #include <mem/owned_ptr.h>
@@ -77,6 +78,9 @@ namespace v {
         FORCEINLINE entt::entity entity() const { return entity_; }
         FORCEINLINE std::string_view name() const { return name_; }
 
+        /// Fired when domain is about to be destroyed
+        FORCEINLINE Signal<void> removing() { return removing_.signal(); }
+
         /// Check if the domain's entity has component T
         template <typename T>
         bool has() const;
@@ -115,10 +119,17 @@ namespace v {
         template <typename T>
         const T* get_ctx() const;
 
+        /// Get a view of all entities with components Ts from the engine
+        template <typename... Ts>
+        auto view();
+
     protected:
         mutable Engine* engine_ = nullptr;
         std::string     name_;
         entt::entity    entity_;
+
+    private:
+        Event<void> removing_;
     };
 
     template <typename Derived>

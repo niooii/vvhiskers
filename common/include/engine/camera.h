@@ -11,8 +11,8 @@ namespace v {
     class Camera : public Domain<Camera> {
     public:
         Camera(f32 fov = 90, f32 aspect = 1.7777f, f32 near = 0.01f, f32 far = 1000.f) :
-            Domain(), fov_(fov), aspect_(aspect), near_(near), far_(far),
-            pitch_(0.0f), yaw_(0.0f), roll_(0.0f)
+            Domain(), fov_(fov), aspect_(aspect), near_(near), far_(far), pitch_(0.0f),
+            yaw_(0.0f), roll_(0.0f)
         {}
 
         void init() override

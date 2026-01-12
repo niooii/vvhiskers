@@ -14,8 +14,9 @@
 #include <engine/context.h>
 #include <engine/contexts/window/window.h>
 #include <engine/domain.h>
-#include <signal.h>
+#include <engine/signal.h>
 #include <string>
+#include <tuple>
 #include <vector>
 #include "engine/sink.h"
 
@@ -49,6 +50,8 @@ namespace v {
         RenderContext* render_ctx_;
 
         bool resize_queued{};
+
+        SignalConnection resize_conn_;
     };
 
     class RenderContext : public Context<RenderContext> {
@@ -63,15 +66,30 @@ namespace v {
         /// Tasks that should run before the rendering of a frame
         DependentSink pre_render;
 
+        struct RenderEventArgs {
+            Engine*        engine;
+            RenderContext* render_ctx;
+            Window*        window;
+        };
+
         // Render event signals
         /// Signal fired before rendering a frame
-        FORCEINLINE Signal<Engine*, RenderContext*, Window*>& prerender() const { return pre_render_event_.signal(); }
+        FORCEINLINE Signal<RenderEventArgs> prerender() const
+        {
+            return pre_render_event_.signal();
+        }
 
         /// Signal fired after rendering a frame
-        FORCEINLINE Signal<Engine*, RenderContext*, Window*>& postrender() const { return post_render_event_.signal(); }
+        FORCEINLINE Signal<RenderEventArgs> postrender() const
+        {
+            return post_render_event_.signal();
+        }
 
         /// Signal fired when window is resized
-        FORCEINLINE Signal<Engine*, RenderContext*, Window*>& resized() const { return resize_event_.signal(); }
+        FORCEINLINE Signal<RenderEventArgs> resized() const
+        {
+            return resize_event_.signal();
+        }
 
         /// Get raw Daxa resources (device, pipeline manager, etc.)
         /// @note Returned reference is valid for the lifetime of RenderContext
@@ -136,8 +154,8 @@ namespace v {
         bool graph_dirty_ = false;
 
         // Internal events
-        mutable Event<Engine*, RenderContext*, Window*> pre_render_event_;
-        mutable Event<Engine*, RenderContext*, Window*> post_render_event_;
-        mutable Event<Engine*, RenderContext*, Window*> resize_event_;
+        Event<RenderEventArgs> pre_render_event_;
+        Event<RenderEventArgs> post_render_event_;
+        Event<RenderEventArgs> resize_event_;
     };
 } // namespace v

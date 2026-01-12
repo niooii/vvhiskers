@@ -51,7 +51,7 @@ namespace v {
         }
     }
 
-    
+
     // NOTE: If this function is ever changed, update the doc comments for
     // SDLComponent::on_win_event to reflect the new list of events
     static bool has_window_id(Uint32 event_type)

@@ -7,8 +7,7 @@
 #include <engine/engine.h>
 
 namespace v {
-    RenderDomainBase::RenderDomainBase()
-    {}
+    RenderDomainBase::RenderDomainBase() {}
 
     void RenderDomainBase::init_render(Engine& engine)
     {

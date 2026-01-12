@@ -18,28 +18,32 @@
 #include "engine/contexts/render/default_render_domain.h"
 
 namespace v {
-    Client::Client(Engine& engine) : Context(engine), running_(true)
+    Client::Client() : running_(true) {}
+
+    void Client::init()
     {
-        // all the contexts the client needs to functino
-        sdl_ctx_    = engine_.add_ctx<SDLContext>();
-        window_ctx_ = engine_.add_ctx<WindowContext>();
+        // all the contexts the client needs to function
+        sdl_ctx_    = engine().add_ctx<SDLContext>();
+        window_ctx_ = engine().add_ctx<WindowContext>();
         window_     = window_ctx_->create_window("hjey man!", { 600, 600 }, { 600, 600 });
 
-        window_->key_pressed().connect([this](Key k)
-        {
-            switch (k)
+        window_->key_pressed().connect(
+            this,
+            [this](Key k)
             {
-            case Key::R:
-                window_->capture_mouse(!window_->capturing_mouse());
-            default:
-            }
-        });
+                switch (k)
+                {
+                case Key::R:
+                    window_->capture_mouse(!window_->capturing_mouse());
+                default:
+                }
+            });
 
-        render_ctx_ = engine_.add_ctx<RenderContext>("./resources/shaders");
-        net_ctx_    = engine_.add_ctx<NetworkContext>(1.0 / 500);
+        render_ctx_ = engine().add_ctx<RenderContext>("./resources/shaders");
+        net_ctx_    = engine().add_ctx<NetworkContext>(1.0 / 500);
 
         constexpr u16 threads   = 16;
-        auto*         async_ctx = engine_.add_ctx<AsyncContext>(threads);
+        auto*         async_ctx = engine().add_ctx<AsyncContext>(threads);
 
         async_ctx->spawn(
             [](CoroutineInterface& ci) -> Coroutine<void>
@@ -52,9 +56,9 @@ namespace v {
         // TODO! this should be order independent, but how? like if i add
         // triangle domain before a clearing domain, the clear should still come first?
         // manual graph ordering maybe?
-        engine_.add_domain<TriangleRenderer>();
-        // engine_.add_domain<DefaultRenderDomain>();
-        auto& mandelbulb = engine_.add_domain<MandelbulbRenderer>();
+        engine().add_domain<TriangleRenderer>();
+        // engine().add_domain<DefaultRenderDomain>();
+        auto& mandelbulb = engine().add_domain<MandelbulbRenderer>();
 
         // Setup network connection
         LOG_INFO("Connecting to server...");
@@ -65,16 +69,16 @@ namespace v {
         auto& channel = connection_->create_channel<ChatChannel>();
 
         // Connect to receive messages
-        channel.received().connect([](const ChatMessage& msg) {
-            LOG_INFO("Received chat message: {}", msg.msg);
-        });
+        channel.received().connect(
+            this, [](const ChatMessage& msg)
+            { LOG_INFO("Received chat message: {}", msg.msg); });
 
         ChatMessage msg;
         msg.msg = "hi server man";
         channel.send(msg);
 
         // windows update task does not depend on anything
-        engine_.on_tick.connect(
+        engine().on_tick.connect(
             {}, {}, "windows",
             [this]()
             {
@@ -83,17 +87,17 @@ namespace v {
             });
 
         // render depends on the window input update task to be finished
-        engine_.on_tick.connect(
+        engine().on_tick.connect(
             { "windows" }, {}, "render", [this]() { render_ctx_->update(); });
 
         // network update task does not depend on anything
-        engine_.on_tick.connect({}, {}, "network", [this]() { net_ctx_->update(); });
+        engine().on_tick.connect({}, {}, "network", [this]() { net_ctx_->update(); });
 
         // async coroutine scheduler update
-        engine_.on_tick.connect({}, {}, "async", [async_ctx]() { async_ctx->update(); });
+        engine().on_tick.connect({}, {}, "async", [async_ctx]() { async_ctx->update(); });
 
         // handle the sdl quit event (includes keyboard interrupt)
-        sdl_ctx_->quit().connect([this]() { running_ = false; });
+        sdl_ctx_->quit().connect(this, [this]() { running_ = false; });
 
         // TODO! temporarily connect to the server with dummy info
         auto name = std::format("Player-{}", rand::irange(0, 1'000'000));
@@ -102,5 +106,5 @@ namespace v {
         connect_chnl.send({ .uuid = name });
     }
 
-    void Client::update() { engine_.tick(); }
+    void Client::update() { engine().tick(); }
 } // namespace v
