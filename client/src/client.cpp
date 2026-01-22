@@ -45,12 +45,13 @@ namespace v {
         constexpr u16 threads   = 16;
         auto*         async_ctx = engine().add_ctx<AsyncContext>(threads);
 
-        async_ctx->spawn(
-            [](CoroutineInterface& ci) -> Coroutine<void>
-            {
-                while (co_await ci.sleep(500))
-                    LOG_DEBUG("500ms hi");
-            });
+        // for some reason this crashes when theres no content
+        // async_ctx->spawn(
+        //     [](CoroutineInterface& ci) -> Coroutine<void>
+        //     {
+        //         // while (co_await ci.sleep(500))
+        //             // LOG_DEBUG("500ms hi");
+        //     });
 
         // test rendering via domains
         // TODO! this should be order independent, but how? like if i add

@@ -9,6 +9,8 @@
 #include <vox/aabb.h>
 
 namespace v {
+    using Coord = glm::ivec3;
+
     template <typename Derived, typename VoxelT>
     class VoxelVolume;
 
@@ -22,8 +24,19 @@ namespace v {
     public:
         // TODO! impl the other csg stuff and defaults for all
 
+        // Implements a conversion function from one voxel type to another, if needed.
+        // TODO! provide default specialization for Type a == b
+        template <typename VoxelTypeA, typename VoxelTypeB>
+        static VoxelTypeB voxel_to(const VoxelTypeA& a) {
+            TODO()
+        }
+
         template <DerivedFromVV From, DerivedFromVV To>
-        static To to(const From&);
+        static To to(const From& f) {
+            To ret{};
+
+            TODO()
+        }
     };
 
     template <typename Derived, typename VoxelT>
@@ -31,15 +44,15 @@ namespace v {
     public:
         using VoxelType = VoxelT;
 
-        std::optional<VoxelType> get(glm::ivec3);
-        u8                       set(glm::ivec3, VoxelType);
+        std::optional<VoxelType> get(Coord);
+        u8                       set(Coord, VoxelType);
 
         void resize(AABB aabb);
         // TODO! template this i forgot the syntax lol
-        void fill(VoxelType(glm::ivec3));
+        void fill(VoxelType(Coord));
 
         struct Iterator {
-            using value_type        = VoxelType;
+            using value_type        = std::pair <Coord, VoxelType>;
             using difference_type   = std::ptrdiff_t;
             using iterator_category = std::forward_iterator_tag;
 
@@ -55,6 +68,11 @@ namespace v {
 
         template <DerivedFromVV Ret = Derived, DerivedFromVV Other = Derived>
         Ret intersect(const Other&);
+
+        /// This is actually a 'union' operation, however you can't name a member function
+        /// a keyword.
+        template <DerivedFromVV Ret = Derived, DerivedFromVV Other = Derived>
+        Ret join(const Other&);
 
         /// Convert the volume to another volume type
         template <DerivedFromVV T>

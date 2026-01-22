@@ -159,6 +159,8 @@ namespace v {
                 LOG_ERROR("Failed to send packet on channel {}", Derived::unique_name());
                 enet_packet_destroy(packet);
             }
+
+            LOG_TRACE("Packet should be queued to send.");
         }
 
     protected:

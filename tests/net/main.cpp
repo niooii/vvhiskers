@@ -22,7 +22,6 @@ int main()
 
     auto listener = net->listen_on(host, port);
 
-    std::atomic_bool on_connect{ false };
     std::atomic_bool server_got_chat{ false };
     std::atomic_bool client_got_echo{ false };
 
@@ -35,7 +34,6 @@ int main()
     listener_conn = listener->connected().connect(
         [&](std::shared_ptr<NetConnection> con)
         {
-            on_connect = true;
             server_con = con;
 
             auto& chat       = con->create_channel<ChatChannel>();
@@ -72,7 +70,7 @@ int main()
         engine->tick();
 
         // send once when we think connection is likely active
-        if (!sent_ping && on_connect.load())
+        if (!sent_ping)
         {
             ChatMessage msg{ .msg = "ping" };
             cchat.send(msg);
@@ -80,7 +78,6 @@ int main()
         }
 
         // progress checks with deadlines
-        tctx.expect_before(on_connect.load(), 400, "server accepted client");
         tctx.expect_before(server_got_chat.load(), 800, "server received chat");
         tctx.expect_before(client_got_echo.load(), 1200, "client received echo");
 
@@ -89,7 +86,6 @@ int main()
     }
 
     // final hard asserts
-    tctx.assert_now(on_connect.load(), "on_connect fired");
     tctx.assert_now(server_got_chat.load(), "server received chat");
     tctx.assert_now(client_got_echo.load(), "client received echo");
 

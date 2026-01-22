@@ -32,6 +32,7 @@ namespace v {
             listener_ = net_ctx->listen_on(conf_.host, conf_.port);
 
             listener_->connected().connect(
+                this,
                 [this](std::shared_ptr<NetConnection> con)
                 {
                     LOG_INFO("Client connected successfully!");
@@ -47,6 +48,7 @@ namespace v {
                     auto& cc = con->create_channel<ChatChannel>();
 
                     cc.received().connect(
+                        this,
                         [this](const ChatMessage& msg)
                         {
                             LOG_INFO("Got message {} from client", msg.msg);

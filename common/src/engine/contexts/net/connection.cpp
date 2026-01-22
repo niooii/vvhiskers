@@ -270,6 +270,7 @@ namespace v {
             }
             else
             {
+                LOG_DEBUG("Channel exists already");
                 info.channel->take_packet(packet);
             }
         }

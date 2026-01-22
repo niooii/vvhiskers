@@ -41,7 +41,7 @@ int main(int argc, char** argv)
             int count = 0;
             while (co_await ci.sleep(100))
             {
-                LOG_INFO("Hi {}", ++count);
+                // LOG_INFO("Hi {}", ++count);
             }
         });
 
