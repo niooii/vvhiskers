@@ -18,8 +18,7 @@ struct TaskDefinition {
 };
 
 /// Task dependency manager
-/// HORRIBLE NAME BTW
-class DependentSink {
+class TaskGraph {
 public:
     /// Connect a task with dependency specifications
     /// @param after Tasks that this task should run AFTER
@@ -27,6 +26,7 @@ public:
     /// @param name Unique name for this task
     /// @param func Function to execute
     /// @note ALL tasks should be thread-safe
+    /// TODO! why doesnt this just take in a task definition?
     FORCEINLINE void connect(
         const std::vector<std::string>& after, const std::vector<std::string>& before,
         const std::string& name, std::function<void()> func)

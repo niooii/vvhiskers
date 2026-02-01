@@ -2,12 +2,12 @@
 // Created by niooi on 8/5/25.
 //
 
-#include <engine/sink.h>
+#include <engine/graph.h>
 #include <prelude.h>
 
 #include <queue>
 
-void DependentSink::rebuild_graph()
+void TaskGraph::rebuild_graph()
 {
     sorted_tasks_.clear();
 
@@ -88,7 +88,7 @@ void DependentSink::rebuild_graph()
     }
 }
 
-void DependentSink::execute()
+void TaskGraph::execute()
 {
     for (const std::string& task_name : sorted_tasks_)
     {

@@ -7,9 +7,7 @@ file(GLOB_RECURSE COMMON_SOURCES
 )
 
 # Create the common library
-add_library(vlib STATIC ${COMMON_SOURCES}
-        include/engine/sink.h
-		src/engine/sink.cpp)
+add_library(vlib STATIC ${COMMON_SOURCES})
 
 # Include directories for common library
 target_include_directories(vlib

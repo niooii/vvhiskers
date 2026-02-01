@@ -27,7 +27,8 @@ void v::init(const char* argv0)
     // enables tracy on static lib linkage
     TracyNoop;
 
-    absl::InitializeSymbolizer(argv0);
+    // TODO! this fails on windows i guess
+    // absl::InitializeSymbolizer(argv0);
     absl::FailureSignalHandlerOptions fail_opts = { .symbolize_stacktrace = true };
 
     absl::InstallFailureSignalHandler(fail_opts);

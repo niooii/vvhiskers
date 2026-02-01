@@ -18,7 +18,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#include "engine/sink.h"
+#include "engine/graph.h"
 
 namespace v {
     class RenderDomainBase;
@@ -64,7 +64,7 @@ namespace v {
         ~RenderContext();
 
         /// Tasks that should run before the rendering of a frame
-        DependentSink pre_render;
+        TaskGraph pre_render;
 
         struct RenderEventArgs {
             Engine*        engine;

@@ -19,7 +19,7 @@ namespace v {
         net_ctx_(ctx), conn_type_(ConnectionType::Outgoing),
         connection_timeout_(connection_timeout)
     {
-        ENetAddress address;
+        ENetAddress address = {};
         if (enet_address_set_host(&address, host.c_str()) != 0)
         {
             enet_deinitialize();

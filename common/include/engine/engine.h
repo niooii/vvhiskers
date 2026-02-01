@@ -14,7 +14,7 @@
 #include <unordered_dense.h>
 
 #include "entt/entity/fwd.hpp"
-#include "sink.h"
+#include "graph.h"
 #include "traits.h"
 
 template <typename T>
@@ -227,10 +227,10 @@ namespace v {
         }
 
         /// Runs every time Engine::tick is called
-        DependentSink on_tick;
+        TaskGraph on_tick;
 
         /// Runs within the Engine's destructor, before domains and contexts are destroyed
-        DependentSink on_destroy;
+        TaskGraph on_destroy;
 
     private:
         /// TODO! this better be destroyed last otherwise stupid bad

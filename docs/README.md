@@ -1,4 +1,4 @@
-# V Engine Documentation
+# vvhiskers
 
 C++23 ECS-heavy voxel engine.
 
@@ -18,9 +18,8 @@ C++23 ECS-heavy voxel engine.
 - **Engine**: The ECS orchestrator, also an entity itself. This lets us request components from systems that are owned by the Engine.  
 - **Contexts**: Singleton services (RenderContext, WindowContext, etc.)
 - **Domains**: Can be a system, a component, or an entity, or some combination of the three, depending on the usage and your design choices.
-- **Components**: Raw data, or a collection of callbacks distributed by some system.
 
-Design heavily inspired by my GOAT [John Lin](Inspired by [Object-Oriented ECS Design](https://voxely.net/blog/object-oriented-entity-component-system-design/)
+Design heavily inspired by my GOAT [John Lin](https://voxely.net/blog/object-oriented-entity-component-system-design/)
 
 ## Ok so, where engine?
 
@@ -53,4 +52,3 @@ SDL    - Provides access to low level SDL events
 
 ### [Reference](reference/)
 - [Build System](reference/build-system.md) - v.py commands
-

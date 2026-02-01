@@ -14,7 +14,6 @@ using namespace v;
 class TestDomain : public Domain<TestDomain> {
 public:
     TestDomain(std::string name = "TestDomain") : Domain(std::move(name)) {}
-    int counter = 0;
 };
 
 int main()
@@ -422,23 +421,28 @@ int main()
     {
         Event<void> event;
 
+        i32 counter = 0;
+
         auto& domain = engine->add_domain<TestDomain>("DomainCaptureTest");
 
-        event.signal().connect(&domain, [&domain]() { domain.counter++; });
+        event.signal().connect(&domain, [&]() { counter++; });
 
         event.fire();
         tctx.assert_now(
-            domain.counter == 1, "Domain-bound lambda fired with this capture");
+            counter == 1, "Domain-bound lambda fired with this capture");
 
         event.fire();
-        tctx.assert_now(domain.counter == 2, "Domain-bound lambda fired again");
+        tctx.assert_now(counter == 2, "Domain-bound lambda fired again");
 
+        auto removing = domain.removing().connect([] {LOG_DEBUG("HETEY EHYES JHYES ");});
         engine->queue_destroy_domain(domain.entity());
+        LOG_DEBUG("blha bluh bluhj puh puh");
         engine->tick();
 
+        LOG_DEBUG("blha bluh bluhj puh puh");
         event.fire();
         tctx.assert_now(
-            domain.counter == 2, "Domain-bound lambda not fired after domain destroyed");
+            counter == 2, "Domain-bound lambda not fired after domain destroyed");
     }
 
     return tctx.is_failure();
